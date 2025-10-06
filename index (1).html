@@ -24,7 +24,17 @@
     a.enlace-mina:hover {
       background-color: #0056b3;
     }
+    #juego {
+      margin: 30px auto;
+      text-align: center;
+    }
+    iframe {
+      border: none;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
   </style>
+
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <!-- Leaflet JS -->
@@ -43,17 +53,16 @@
   </div>
   <div id="map"></div>
 
+  <!-- Script del mapa -->
   <script>
     let map = L.map("map").setView([-30.5, -69.2], 7);
 
-    // Cargar mapa base desde OpenStreetMap
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
     }).addTo(map);
 
     const markers = [];
 
-    // Minas principales en San Juan con info detallada
     const minas = [
       { 
         nombre: "Minera Veladero", 
@@ -110,7 +119,6 @@
     ];
 
     function mostrarMarcadores(filtro) {
-      // Eliminar marcadores anteriores
       markers.forEach(m => map.removeLayer(m));
       markers.length = 0;
 
@@ -138,8 +146,21 @@
       });
     }
 
-    // Mostrar todos al inicio
     mostrarMarcadores("Todos");
   </script>
+
+  <!-- Juego Educaplay -->
+  <div id="juego">
+    <h2>🎮 Crucigrama Educativo: Minería en Argentina</h2>
+    <iframe 
+      allow="fullscreen; autoplay; allow-top-navigation-by-user-activation" 
+      allowfullscreen 
+      width="795" 
+      height="690" 
+      frameborder="0" 
+      src="https://es.educaplay.com/juego/25708567-crucigrama_educaplay_mineria_en_argentina.html">
+    </iframe>
+  </div>
+
 </body>
 </html>
