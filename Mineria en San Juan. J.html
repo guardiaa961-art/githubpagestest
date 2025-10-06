@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Minas en San Juan - Argentina</title>
+  <meta charset="utf-8" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f7fa;
+    }
+    h1 {
+      text-align: center;
+      background-color: #007bff;
+      color: white;
+      padding: 15px 0;
+      margin: 0;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+    }
+    #filter {
+      margin: 15px;
+      text-align: center;
+    }
+    #map {
+      height: 80vh;
+      width: 100%;
+    }
+    a.enlace-mina {
+      display: inline-block;
+      margin-top: 5px;
+      padding: 5px 10px;
+      background-color: #007bff;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+    }
+    a.enlace-mina:hover {
+      background-color: #0056b3;
+    }
+
+    /* Estilo del contenedor del juego */
+    #juego {
+      margin: 40px auto;
+      text-align: center;
+      padding: 20px;
+      background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+      border-radius: 20px;
+      width: 85%;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);
+    }
+
+    /* 🎨 Título animado */
+    #titulo-juego {
+      font-size: 2em;
+      font-weight: bold;
+      color: #0d47a1;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      animation: colorCambio 4s infinite alternate;
+      margin-bottom: 20px;
+    }
+
+    @keyframes colorCambio {
+      0% { color: #0d47a1; }
+      25% { color: #1565c0; }
+      50% { color: #1e88e5; }
+      75% { color: #42a5f5; }
+      100% { color: #64b5f6; }
+    }
+
+    iframe {
+      border: none;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      max-width: 90%;
+    }
+  </style>
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+</head>
+
+<body>
+  <h1>Principales Minas en San Juan</h1>
+
+  <div id="filter">
+    <label for="mineralFilter">Filtrar por mineral:</label>
+    <select id="mineralFilter" onchange="mostrarMarcadores(this.value)">
+      <option value="Todos">Todos</option>
+      <option value="Cobre">Cobre</option>
+      <option value="Oro">Oro</option>
+      <option value="Plata">Plata</option>
+    </select>
+  </div>
+
+  <div id="map"></div>
+
+  <script>
+    let map = L.map("map").setView([-30.5, -69.2], 7);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    const markers = [];
+
+    const minas = [
+      { 
+        nombre: "Minera Veladero", 
+        provincia: "San Juan", 
+        departamento: "Iglesia", 
+        mineral: "Oro", 
+        empresa: "Barrick Gold / Shandong Gold",
+        estado: "En producción", 
+        altitud: "4.000 msnm",
+        inversion: "U$S 5.000 millones",
+        lat: -29.598, 
+        lng: -69.166,
+        link: "https://web.sanjuan.gob.ar/ipeem/?page_id=217"
+      },
+      { 
+        nombre: "Minera Pascua-Lama", 
+        provincia: "San Juan", 
+        departamento: "Iglesia", 
+        mineral: "Oro, Plata", 
+        empresa: "Barrick Gold",
+        estado: "Suspendido", 
+        altitud: "4.500 msnm",
+        inversion: "U$S 8.500 millones (estimado)",
+        lat: -29.591, 
+        lng: -69.216,
+        link: "https://center-hre.org/wp-content/uploads/2011/09/ficha-tecnica-Pascua-Lama.pdf"
+      },
+      { 
+        nombre: "Proyecto El Pachón", 
+        provincia: "San Juan", 
+        departamento: "Calingasta", 
+        mineral: "Cobre", 
+        empresa: "Glencore Xstrata",
+        estado: "Exploración avanzada", 
+        altitud: "3.600 msnm",
+        inversion: "U$S 4.500 millones (estimado)",
+        lat: -30.500, 
+        lng: -69.000,
+        link: "https://www.elpachon.com.ar/usos-del-cobre"
+      },
+      { 
+        nombre: "Proyecto Mina Josemaría", 
+        provincia: "San Juan", 
+        departamento: "Iglesia", 
+        mineral: "Cobre, Oro, Plata", 
+        empresa: "Desconocida",
+        estado: "Exploración / Desarrollo avanzado", 
+        altitud: "4.230 msnm",
+        inversion: "Desconocida",
+        lat: -29.25, 
+        lng: -69.73,
+        link: "https://josemaria.ar/el-proyecto/"
+      }
+    ];
+
+    function mostrarMarcadores(filtro) {
+      markers.forEach(m => map.removeLayer(m));
+      markers.length = 0;
+
+      minas.forEach(mina => {
+        if (filtro === "Todos" || mina.mineral.includes(filtro)) {
+          const marker = L.marker([mina.lat, mina.lng]).addTo(map);
+          let popupContent = `
+            <h3>${mina.nombre}</h3>
+            <p><b>Provincia:</b> ${mina.provincia}</p>
+            <p><b>Departamento:</b> ${mina.departamento}</p>
+            <p><b>Mineral principal:</b> ${mina.mineral}</p>
+            <p><b>Empresa operadora:</b> ${mina.empresa}</p>
+            <p><b>Estado:</b> ${mina.estado}</p>
+            <p><b>Altitud:</b> ${mina.altitud}</p>
+            <p><b>Inversión estimada:</b> ${mina.inversion}</p>
+          `;
+          if (mina.link) {
+            popupContent += `
+              <a href="${mina.link}" target="_blank" class="enlace-mina">Más información</a>
+            `;
+          }
+          marker.bindPopup(popupContent);
+          markers.push(marker);
+        }
+      });
+    }
+
+    mostrarMarcadores("Todos");
+  </script>
+
+  <!-- 🎮 Juego de Educaplay -->
+  <div id="juego">
+    <div id="titulo-juego">🎮 Crucigrama Educativo: Minería en Argentina ⛏️</div>
+    <iframe 
+      allow="fullscreen; autoplay; allow-top-navigation-by-user-activation" 
+      allowfullscreen 
+      width="795" 
+      height="690" 
+      src="https://es.educaplay.com/juego/25708567-crucigrama_educaplay_mineria_en_argentina.html">
+    </iframe>
+  </div>
+
+</body>
+</html>
